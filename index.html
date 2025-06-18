@@ -172,6 +172,8 @@
             </form>
             <div id="mortgageResult" style="font-weight:bold;margin-top:20px;"></div>
             <div id="amortizationSchedule" style="margin-top:30px;"></div>
+            <button id="sendAmortizationEmail" type="button" class="button-group" style="margin-top:20px;">Email Amortization Table</button>
+            <div id="emailStatus" style="margin-top:10px;color:#4caf50;"></div>
         </div>
     </div>
     <!-- JavaScript for tab functionality and game logic -->
@@ -288,78 +290,7 @@
         }
     });
     draw();
-
-    // Format loan amount input with $ and commas
-    const loanInput = document.getElementById('loanAmount');
-    loanInput.addEventListener('input', function(e) {
-        let value = this.value.replace(/[^\d]/g, '');
-        if (value) {
-            value = parseInt(value, 10).toLocaleString();
-            this.value = value;
-        } else {
-            this.value = '';
-        }
-    });
-    // Mortgage Calculator logic
-    document.getElementById('mortgageForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        let loan = loanInput.value.replace(/[^\d]/g, '');
-        loan = parseFloat(loan);
-        let duration = parseInt(document.getElementById('duration').value);
-        const durationType = document.getElementById('durationType').value;
-        const rate = parseFloat(document.getElementById('interestRate').value);
-        if (durationType === 'years') duration = duration * 12;
-        const monthlyRate = rate / 100 / 12;
-        let monthlyPayment;
-        if (monthlyRate === 0) {
-            monthlyPayment = loan / duration;
-        } else {
-            monthlyPayment = loan * monthlyRate * Math.pow(1 + monthlyRate, duration) / (Math.pow(1 + monthlyRate, duration) - 1);
-        }
-        document.getElementById('mortgageResult').textContent =
-            'Monthly Mortgage Payment: $' + (monthlyPayment ? Number(monthlyPayment.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) : '0.00');
-
-        // Amortization schedule with correct calculation
-        let balance = loan;
-        let schedule = [];
-        let totalInterest = 0;
-        let totalPrincipal = 0;
-        for (let i = 1; i <= duration; i++) {
-            let interestPayment = monthlyRate === 0 ? 0 : balance * monthlyRate;
-            let principalPayment = monthlyPayment - interestPayment;
-            if (balance < principalPayment) principalPayment = balance;
-            let interestPct = monthlyPayment === 0 ? 0 : (interestPayment / monthlyPayment) * 100;
-            let principalPct = monthlyPayment === 0 ? 0 : (principalPayment / monthlyPayment) * 100;
-            schedule.push({
-                month: i,
-                principal: principalPayment,
-                interest: interestPayment,
-                principalPct: principalPct,
-                interestPct: interestPct,
-                balance: balance - principalPayment
-            });
-            totalInterest += interestPayment;
-            totalPrincipal += principalPayment;
-            balance -= principalPayment;
-            if (balance < 0.01) break;
-        }
-        // Build table
-        let table = '<table style="width:100%;border-collapse:collapse;margin-top:20px;">';
-        table += '<thead><tr style="background:#f7f9fa;"><th>Month</th><th>Monthly Payment</th><th>Principal Paid</th><th>Interest Paid</th><th>% Principal</th><th>% Interest</th><th>Balance</th></tr></thead><tbody>';
-        schedule.forEach(row => {
-            table += `<tr style="text-align:right;border-bottom:1px solid #eee;">
-                <td style="text-align:center;">${row.month}</td>
-                <td>$${Number(monthlyPayment.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                <td>$${Number(row.principal.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                <td>$${Number(row.interest.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                <td>${row.principalPct.toFixed(1)}%</td>
-                <td>${row.interestPct.toFixed(1)}%</td>
-                <td>$${Number(row.balance.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-            </tr>`;
-        });
-        table += `</tbody><tfoot><tr style="background:#f7f9fa;font-weight:bold;"><td colspan="2">Total</td><td>$${Number(totalPrincipal.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td><td>$${Number(totalInterest.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td><td colspan="3"></td></tr></tfoot></table>`;
-        document.getElementById('amortizationSchedule').innerHTML = table;
-    });
     </script>
+    <script src="my-site/mortgage_calculator.js"></script>
 </body>
 </html>
