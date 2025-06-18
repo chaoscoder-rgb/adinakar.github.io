@@ -13,6 +13,13 @@
         .button-group { display: flex; gap: 10px; margin-top: 20px; }
         button { width: 100px; }
     </style>
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <script>
+      (function(){
+        emailjs.init("DVhTxcvj8vVKkSfKv");
+      })();
+    </script>
 </head>
 <body>
     <!-- Heading for contact form -->
@@ -33,7 +40,7 @@
 
         <!-- Description textarea -->
         <label for="description">Description</label>
-        <textarea id="description" name="description" rows="5" required></textarea>
+        <textarea id="description" name="description" rows="5"></textarea>
 
         <!-- File attachment input -->
         <label for="attachment">Attach File</label>
@@ -47,32 +54,14 @@
     </form>
     <!-- JavaScript for form submission (currently prevents default) -->
     <script>
-        document.querySelector('form').addEventListener('submit', async function(e) {
+        document.querySelector('form').addEventListener('submit', function(e) {
             e.preventDefault();
-
-            // Simple client-side validation
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const subject = document.getElementById('subject').value.trim();
-            const description = document.getElementById('description').value.trim();
-
-            if (!name || !email || !subject || !description) {
-                alert('Please fill in all required fields.');
-                return;
-            }
-
-            // Prepare form data
-            const formData = new FormData(this);
-
-            // Example: Use EmailJS (https://www.emailjs.com/) for client-side email sending
-            // You need to sign up at EmailJS and replace the following with your actual service, template, and user IDs
-            // This is a placeholder and won't work until you configure EmailJS
-            emailjs.sendForm('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', this, 'YOUR_USER_ID')
-                .then(function() {
-                    alert('Message sent successfully!');
-                }, function(error) {
-                    alert('Failed to send message. Please try again later.');
-                });
+            emailjs.sendForm('service_6twambp', 'template_b1nqmbo', this)
+              .then(function() {
+                alert('Message sent!');
+              }, function(error) {
+                alert('Failed to send: ' + JSON.stringify(error));
+              });
         });
     </script>
 </body>
