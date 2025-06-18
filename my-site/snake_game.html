@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Snake Game</title>
+    <style>
+        body { background: #222; color: #fff; font-family: Arial, sans-serif; text-align: center; margin: 0; }
+        #gameContainer { display: flex; flex-direction: column; align-items: center; margin-top: 30px; }
+        #snakeCanvas { background: #111; display: block; margin: 0 auto; border: 2px solid #444; }
+        .title {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        .scoreboard {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            text-align: right;
+        }
+        .score {
+            font-size: 1em;
+            font-weight: normal;
+        }
+        .level {
+            font-size: 0.9em;
+            color: #aaa;
+        }
+        @media (max-width: 600px) {
+            #snakeCanvas { width: 95vw !important; height: 60vw !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="title">Snake Game</div>
+    <div class="scoreboard">
+        <div class="score" id="score">Score: 0</div>
+        <div class="level" id="level">Level: 1</div>
+    </div>
+    <div id="gameContainer">
+        <canvas id="snakeCanvas" width="800" height="520"></canvas>
+    </div>
+    <div style="margin-top: 30px;">
+        <a href="../index.html" style="color:#4caf50; font-size:1.1em; text-decoration:underline;">&larr; Back to Home Page</a>
+    </div>
+    <script>
+    // Game settings
+    const canvas = document.getElementById('snakeCanvas');
+    const ctx = canvas.getContext('2d');
+    const tileSize = 20;
+    const width = canvas.width;
+    const height = canvas.height;
+    let snake = [{x: 10, y: 10}];
+    let direction = {x: 1, y: 0};
+    let meal = randomMeal();
+    let score = 0;
+    let level = 1;
+    let moveDelay = 120;
+    let changingDirection = false;
+    let gameInterval = setInterval(gameLoop, moveDelay);
+
+    function randomMeal() {
+        let pos;
+        do {
+            pos = {
+                x: Math.floor(Math.random() * (width / tileSize)),
+                y: Math.floor(Math.random() * (height / tileSize))
+            };
+        } while (snake.some(seg => seg.x === pos.x && seg.y === pos.y));
+        return pos;
+    }
+
+    function draw() {
+        ctx.fillStyle = '#111';
+        ctx.fillRect(0, 0, width, height);
+        // Draw meal
+        ctx.fillStyle = '#e74c3c';
+        ctx.fillRect(meal.x * tileSize, meal.y * tileSize, tileSize, tileSize);
+        // Draw snake
+        ctx.fillStyle = '#2ecc40';
+        snake.forEach((seg, i) => {
+            ctx.fillRect(seg.x * tileSize, seg.y * tileSize, tileSize, tileSize);
+        });
+    }
+
+    function gameLoop() {
+        changingDirection = false;
+        // Move snake
+        const head = {x: (snake[0].x + direction.x + width / tileSize) % (width / tileSize),
+                      y: (snake[0].y + direction.y + height / tileSize) % (height / tileSize)};
+        // Check self-collision
+        if (snake.some(seg => seg.x === head.x && seg.y === head.y)) {
+            clearInterval(gameInterval);
+            alert('Game Over! Final Score: ' + score);
+            document.location.reload();
+            return;
+        }
+        snake.unshift(head);
+        // Check meal
+        if (head.x === meal.x && head.y === meal.y) {
+            score++;
+            if (score % 10 === 0) {
+                level++;
+                clearInterval(gameInterval);
+                moveDelay = Math.max(40, moveDelay - 15);
+                gameInterval = setInterval(gameLoop, moveDelay);
+            }
+            meal = randomMeal();
+        } else {
+            snake.pop();
+        }
+        draw();
+        document.getElementById('score').textContent = 'Score: ' + score;
+        document.getElementById('level').textContent = 'Level: ' + level;
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (changingDirection) return;
+        changingDirection = true;
+        switch(e.key) {
+            case 'ArrowUp':
+                if (direction.y !== 1) direction = {x: 0, y: -1};
+                break;
+            case 'ArrowDown':
+                if (direction.y !== -1) direction = {x: 0, y: 1};
+                break;
+            case 'ArrowLeft':
+                if (direction.x !== 1) direction = {x: -1, y: 0};
+                break;
+            case 'ArrowRight':
+                if (direction.x !== -1) direction = {x: 1, y: 0};
+                break;
+        }
+    });
+    draw();
+    </script>
+</body>
+</html>
