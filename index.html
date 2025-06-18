@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Home Page</title>
+    <link rel="stylesheet" href="my-site/style.css">
     <!-- Inline CSS for background image and layout -->
     <style>
         body {
@@ -14,79 +15,351 @@
             margin: 0;
             min-height: 100vh;
         }
+        .tab-container {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 30px;
+            margin-left: 40px;
+            gap: 0;
+        }
+        .tab-btn {
+            background: #f7f9fa;
+            border: 1px solid #4caf50;
+            border-bottom: none;
+            color: #4caf50;
+            padding: 12px 32px;
+            margin: 0;
+            font-size: 1.08em;
+            font-weight: 600;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            outline: none;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 4px rgba(44,62,80,0.04);
+            position: relative;
+            z-index: 2;
+        }
+        .tab-btn:not(:first-child) {
+            border-left: none;
+        }
+        .tab-btn.active, .tab-btn:hover {
+            background: #4caf50;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(44,62,80,0.08);
+        }
+        .tab-content {
+            display: none;
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+            padding: 30px 40px;
+            position: relative;
+            top: -2px;
+            z-index: 1;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .scoreboard { position: static !important; text-align: right; margin-bottom: 10px; }
+        @media (max-width: 700px) {
+            .tab-content { padding: 20px 10px; }
+            .tab-btn { padding: 8px 10px; font-size: 1em; }
+            .tab-container { margin-left: 0; }
+        }
     </style>
 </head>
 <body>
     <!-- Main heading -->
     <h1>Welcome to my Home Page!</h1>
-    <!-- Link to About page -->
-    <p><a href="about.html">About Me</a></p>
-    <section>
-        <!-- Section for places lived or visited -->
-        <h2>Places I've Been To or Grew Up</h2>
-        <h3>India</h3>
-        <ul>
-            <!-- List of Indian cities -->
-            <li><a href="https://en.wikipedia.org/wiki/Hyderabad" target="_blank">Hyderabad</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Pune" target="_blank">Pune</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Bangalore" target="_blank">Bangalore</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Ooty" target="_blank">Ooty</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Munnar" target="_blank">Munnar</a></li>
-        </ul>
-        <h3>Canada</h3>
-        <ul>
-            <!-- List of Canadian cities -->
-            <li><a href="https://en.wikipedia.org/wiki/Toronto" target="_blank">Toronto</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Ottawa" target="_blank">Ottawa</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Montreal" target="_blank">Montreal</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Niagara_Falls" target="_blank">Niagara Falls</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/London,_Ontario" target="_blank">London, Ontario</a></li>
-        </ul>
-        <h3>USA</h3>
-        <ul>
-            <!-- List of US cities -->
-            <li><a href="https://en.wikipedia.org/wiki/Dallas" target="_blank">Dallas</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/San_Francisco" target="_blank">San Francisco</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Pasadena" target="_blank">Pasadena</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/San_Diego" target="_blank">San Diego</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Houston" target="_blank">Houston</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Austin,_Texas" target="_blank">Austin</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Phoenix,_Arizona" target="_blank">Phoenix</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Sedona,_Arizona" target="_blank">Sedona</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Flagstaff,_Arizona" target="_blank">Flagstaff</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Las_Vegas" target="_blank">Las Vegas</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Reno,_Nevada" target="_blank">Reno</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Los_Angeles" target="_blank">Los Angeles</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/New_York_City" target="_blank">New York</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Washington,_D.C." target="_blank">Washington DC</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Seattle" target="_blank">Seattle</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Portland,_Oregon" target="_blank">Portland</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Columbus,_Ohio" target="_blank">Columbus</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Jacksonville,_Florida" target="_blank">Jacksonville</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Tampa,_Florida" target="_blank">Tampa</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Atlanta" target="_blank">Atlanta</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Chattanooga,_Tennessee" target="_blank">Chattanooga</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/New_Orleans" target="_blank">New Orleans</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Detroit" target="_blank">Detroit</a></li>
-        </ul>
-        <h3>Other Countries</h3>
-        <ul>
-            <!-- List of cities in other countries -->
-            <li><a href="https://en.wikipedia.org/wiki/London" target="_blank">London</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Welwyn_Garden_City" target="_blank">Welwyn Garden City</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Barcelona" target="_blank">Barcelona</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Ibiza" target="_blank">Ibiza</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Singapore" target="_blank">Singapore</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Mexico_City" target="_blank">Mexico City</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Medell%C3%ADn" target="_blank">Medellin</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Cartagena,_Colombia" target="_blank">Cartagena</a></li>
-            <li><a href="https://en.wikipedia.org/wiki/Panama_City" target="_blank">Panama</a></li>
-        </ul>
-    </section>
-    <!-- Link to Contact page -->
-    <a href="contact.html">Contact Me</a>
-    <!-- Link to Snake Game page -->
-    <br>
-    <a href="my-site/snake_game.html">Play Snake Game</a>
+    <div style="max-width:900px;margin:0 auto;">
+        <div class="tab-container">
+            <!-- Tab buttons for navigation -->
+            <button class="tab-btn active" onclick="showTab('about')">About Me</button>
+            <button class="tab-btn" onclick="showTab('contact')">Contact</button>
+            <button class="tab-btn" onclick="showTab('snake')">Snake Game</button>
+            <button class="tab-btn" onclick="showTab('utilities')">Utilities</button>
+        </div>
+        <div id="about" class="tab-content active">
+            <!-- About Me Content -->
+            <h2>Dinakar Anumolu</h2>
+            <p><em>Director of Engineering | GenAI & Cloud Transformation Leader</em></p>
+            <p>I'm a technology leader with over 20 years of experience driving large-scale IT transformations, modernizing legacy systems, and spearheading enterprise-wide <span class="highlight">GenAI adoption</span> at Fortune 500 companies. My expertise lies at the intersection of <span class="highlight">engineering excellence, strategic program management, and cutting-edge technologies</span> like AWS, Terraform, and AI-driven automation.</p>
+            <h3>Professional Leadership</h3>
+            <ul>
+                <li>Developed <span class="highlight">patented dependency management solution</span> enabling traceability across microservices architecture, reducing regression effort by 30% and production incidents by 50%</li>
+                <li>Spearheaded enterprise-wide <span class="highlight">GenAI tool adoption</span> from POC to production rollout, coordinating across security, legal, and engineering teams</li>
+                <li>Architected full traceability dashboard integrating data from 9+ systems (JIRA, ALM, BitBucket) to visualize release metrics and testing coverage</li>
+            </ul>
+            <h3>Biggest PBM in the USA (9 Years)</h3>
+            <ul>
+                <li>Directed digital engineering for <span class="highlight">Medicaid systems</span> serving 12+ applications, achieving <span class="highlight">24% cost reduction</span> in regression testing over two years</li>
+                <li>Established <span class="highlight">Automation Center of Excellence</span> that increased regression coverage by 35% while reducing execution time by 40%</li>
+                <li>Pioneered <span class="highlight">accessibility testing framework</span> as part of QE standards, ensuring compliance for 42+ client implementations</li>
+                <li>Led implementation of <span class="highlight">continuous testing</span> using GitLab/Jenkins, reducing manual validation efforts by 1,000+ hours annually</li>
+                <li>Realized <span class="highlight">$1M+ annual savings</span> through 100+ efficiency initiatives including standardized test beds and parallel testing</li>
+                <li>Managed <span class="highlight">50+ member teams</span> in onsite-offshore model with 80k+ annual budget hours</li>
+            </ul>
+            <h3>Certifications & Credentials</h3>
+            <div class="certifications">
+                <span class="cert-badge">Advanced Certified Scrum Product Owner</span>
+                <span class="cert-badge">ITIL Foundation (IT Service Management)</span>
+                <span class="cert-badge">Agile Bootcamp Certification</span>
+                <span class="cert-badge">TRIZ (Theory of Inventive Problem Solving)</span>
+                <span class="cert-badge">Data Privacy Professional</span>
+                <span class="cert-badge">Transition to Advanced Leadership</span>
+                <span class="cert-badge">ISO 9001/2000 Implementation</span>
+            </div>
+            <h3>Personal Life</h3>
+            <ul>
+                <li><strong>Fitness & Health</strong>: Committed to functional training and nutrition, with 5+ years tracking macros and completing 10+ half-marathons</li>
+                <li><strong>Travel</strong>: Believe in having feet to move and not to be still. Take every opportunity to explore new cultures and environments.</li>
+                <li><strong>Continuous Learning</strong>: Currently learning on upskilling in cloud technologies and AI/ML</li>
+            </ul>
+        </div>
+        <div id="contact" class="tab-content">
+            <!-- Contact Content -->
+            <h2>Contact Me</h2>
+            <form id="contactForm" action="#" method="post" enctype="multipart/form-data">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+                <label for="subject">Subject</label>
+                <input type="text" id="subject" name="subject" required>
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="5"></textarea>
+                <label for="attachment">Attach File</label>
+                <input type="file" id="attachment" name="attachment">
+                <div class="button-group">
+                    <button type="submit">Send</button>
+                    <button type="reset">Cancel</button>
+                </div>
+            </form>
+        </div>
+        <div id="snake" class="tab-content">
+            <!-- Snake Game Content -->
+            <div class="title" style="color:#222;">Snake Game</div>
+            <div class="scoreboard">
+                <div class="score" id="score">Score: 0</div>
+                <div class="level" id="level">Level: 1</div>
+            </div>
+            <div id="gameContainer">
+                <canvas id="snakeCanvas" width="800" height="520"></canvas>
+            </div>
+        </div>
+        <div id="utilities" class="tab-content">
+            <h2>Utilities</h2>
+            <h3>Mortgage Calculator</h3>
+            <form id="mortgageForm" style="max-width:400px;margin:20px auto;text-align:left;">
+                <label for="loanAmount">Loan Amount</label>
+                <div style="position:relative;">
+                    <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#888;font-size:1.1em;pointer-events:none;">$</span>
+                    <input type="text" id="loanAmount" name="loanAmount" min="0" required style="padding-left:22px;">
+                </div>
+                <label for="duration">Duration</label>
+                <input type="number" id="duration" name="duration" min="1" required>
+                <select id="durationType" name="durationType">
+                    <option value="years">Years</option>
+                    <option value="months">Months</option>
+                </select>
+                <label for="interestRate">Interest Rate (%)</label>
+                <input type="number" id="interestRate" name="interestRate" min="0" step="0.01" required>
+                <div class="button-group">
+                    <button type="submit">Calculate</button>
+                </div>
+            </form>
+            <div id="mortgageResult" style="font-weight:bold;margin-top:20px;"></div>
+            <div id="amortizationSchedule" style="margin-top:30px;"></div>
+        </div>
+    </div>
+    <!-- JavaScript for tab functionality and game logic -->
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <script>
+    // Tab switching logic
+    function showTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+        document.querySelector('.tab-btn[onclick*="' + tab + '"]').classList.add('active');
+        document.getElementById(tab).classList.add('active');
+    }
+
+    // Contact form handler (EmailJS)
+    (function(){
+        emailjs.init("DVhTxcvj8vVKkSfKv");
+    })();
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        emailjs.sendForm('service_6twambp', 'template_b1nqmbo', this)
+          .then(function() {
+            alert('Message sent!');
+          }, function(error) {
+            alert('Failed to send: ' + JSON.stringify(error));
+          });
+    });
+
+    // Snake Game logic
+    const canvas = document.getElementById('snakeCanvas');
+    const ctx = canvas.getContext('2d');
+    const tileSize = 20;
+    const width = canvas.width;
+    const height = canvas.height;
+    let snake = [{x: 10, y: 10}];
+    let direction = {x: 1, y: 0};
+    let meal = randomMeal();
+    let score = 0;
+    let level = 1;
+    let moveDelay = 120;
+    let changingDirection = false;
+    let gameInterval = setInterval(gameLoop, moveDelay);
+
+    function randomMeal() {
+        let pos;
+        do {
+            pos = {
+                x: Math.floor(Math.random() * (width / tileSize)),
+                y: Math.floor(Math.random() * (height / tileSize))
+            };
+        } while (snake.some(seg => seg.x === pos.x && seg.y === pos.y));
+        return pos;
+    }
+
+    function draw() {
+        ctx.fillStyle = '#111';
+        ctx.fillRect(0, 0, width, height);
+        // Draw meal
+        ctx.fillStyle = '#e74c3c';
+        ctx.fillRect(meal.x * tileSize, meal.y * tileSize, tileSize, tileSize);
+        // Draw snake
+        ctx.fillStyle = '#2ecc40';
+        snake.forEach((seg, i) => {
+            ctx.fillRect(seg.x * tileSize, seg.y * tileSize, tileSize, tileSize);
+        });
+    }
+
+    function gameLoop() {
+        changingDirection = false;
+        // Move snake
+        const head = {x: (snake[0].x + direction.x + width / tileSize) % (width / tileSize),
+                      y: (snake[0].y + direction.y + height / tileSize) % (height / tileSize)};
+        // Check self-collision
+        if (snake.some(seg => seg.x === head.x && seg.y === head.y)) {
+            clearInterval(gameInterval);
+            alert('Game Over! Final Score: ' + score);
+            document.location.reload();
+            return;
+        }
+        snake.unshift(head);
+        // Check meal
+        if (head.x === meal.x && head.y === meal.y) {
+            score++;
+            if (score % 10 === 0) {
+                level++;
+                clearInterval(gameInterval);
+                moveDelay = Math.max(40, moveDelay - 15);
+                gameInterval = setInterval(gameLoop, moveDelay);
+            }
+            meal = randomMeal();
+        } else {
+            snake.pop();
+        }
+        draw();
+        document.getElementById('score').textContent = 'Score: ' + score;
+        document.getElementById('level').textContent = 'Level: ' + level;
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (changingDirection) return;
+        changingDirection = true;
+        switch(e.key) {
+            case 'ArrowUp':
+                if (direction.y !== 1) direction = {x: 0, y: -1};
+                break;
+            case 'ArrowDown':
+                if (direction.y !== -1) direction = {x: 0, y: 1};
+                break;
+            case 'ArrowLeft':
+                if (direction.x !== 1) direction = {x: -1, y: 0};
+                break;
+            case 'ArrowRight':
+                if (direction.x !== -1) direction = {x: 1, y: 0};
+                break;
+        }
+    });
+    draw();
+
+    // Format loan amount input with $ and commas
+    const loanInput = document.getElementById('loanAmount');
+    loanInput.addEventListener('input', function(e) {
+        let value = this.value.replace(/[^\d]/g, '');
+        if (value) {
+            value = parseInt(value, 10).toLocaleString();
+            this.value = value;
+        } else {
+            this.value = '';
+        }
+    });
+    // Mortgage Calculator logic
+    document.getElementById('mortgageForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        let loan = loanInput.value.replace(/[^\d]/g, '');
+        loan = parseFloat(loan);
+        let duration = parseInt(document.getElementById('duration').value);
+        const durationType = document.getElementById('durationType').value;
+        const rate = parseFloat(document.getElementById('interestRate').value);
+        if (durationType === 'years') duration = duration * 12;
+        const monthlyRate = rate / 100 / 12;
+        let monthlyPayment;
+        if (monthlyRate === 0) {
+            monthlyPayment = loan / duration;
+        } else {
+            monthlyPayment = loan * monthlyRate * Math.pow(1 + monthlyRate, duration) / (Math.pow(1 + monthlyRate, duration) - 1);
+        }
+        document.getElementById('mortgageResult').textContent =
+            'Monthly Mortgage Payment: $' + (monthlyPayment ? Number(monthlyPayment.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) : '0.00');
+
+        // Amortization schedule with correct calculation
+        let balance = loan;
+        let schedule = [];
+        let totalInterest = 0;
+        let totalPrincipal = 0;
+        for (let i = 1; i <= duration; i++) {
+            let interestPayment = monthlyRate === 0 ? 0 : balance * monthlyRate;
+            let principalPayment = monthlyPayment - interestPayment;
+            if (balance < principalPayment) principalPayment = balance;
+            let interestPct = monthlyPayment === 0 ? 0 : (interestPayment / monthlyPayment) * 100;
+            let principalPct = monthlyPayment === 0 ? 0 : (principalPayment / monthlyPayment) * 100;
+            schedule.push({
+                month: i,
+                principal: principalPayment,
+                interest: interestPayment,
+                principalPct: principalPct,
+                interestPct: interestPct,
+                balance: balance - principalPayment
+            });
+            totalInterest += interestPayment;
+            totalPrincipal += principalPayment;
+            balance -= principalPayment;
+            if (balance < 0.01) break;
+        }
+        // Build table
+        let table = '<table style="width:100%;border-collapse:collapse;margin-top:20px;">';
+        table += '<thead><tr style="background:#f7f9fa;"><th>Month</th><th>Monthly Payment</th><th>Principal Paid</th><th>Interest Paid</th><th>% Principal</th><th>% Interest</th><th>Balance</th></tr></thead><tbody>';
+        schedule.forEach(row => {
+            table += `<tr style="text-align:right;border-bottom:1px solid #eee;">
+                <td style="text-align:center;">${row.month}</td>
+                <td>$${Number(monthlyPayment.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                <td>$${Number(row.principal.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                <td>$${Number(row.interest.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                <td>${row.principalPct.toFixed(1)}%</td>
+                <td>${row.interestPct.toFixed(1)}%</td>
+                <td>$${Number(row.balance.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+            </tr>`;
+        });
+        table += `</tbody><tfoot><tr style="background:#f7f9fa;font-weight:bold;"><td colspan="2">Total</td><td>$${Number(totalPrincipal.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td><td>$${Number(totalInterest.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td><td colspan="3"></td></tr></tfoot></table>`;
+        document.getElementById('amortizationSchedule').innerHTML = table;
+    });
+    </script>
 </body>
 </html>

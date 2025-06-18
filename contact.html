@@ -4,15 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Contact Me</title>
-    <!-- Inline CSS for form styling -->
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        form { max-width: 500px; margin: auto; }
-        label { display: block; margin-top: 15px; }
-        input, textarea, button { width: 100%; padding: 8px; margin-top: 5px; }
-        .button-group { display: flex; gap: 10px; margin-top: 20px; }
-        button { width: 100px; }
-    </style>
+    <link rel="stylesheet" href="my-site/style.css">
     <!-- EmailJS SDK -->
     <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
     <script>
@@ -22,9 +14,7 @@
     </script>
 </head>
 <body>
-    <div style="position: absolute; top: 20px; right: 40px;">
-        <a href="index.html" style="color:#4caf50; font-size:1.1em; text-decoration:underline;">&larr; Home</a>
-    </div>
+    <a href="index.html" class="header-link">&larr; Home</a>
     <!-- Heading for contact form -->
     <h2>Contact Me</h2>
     <!-- Contact form starts here -->
