@@ -169,6 +169,7 @@
                 <input type="number" id="interestRate" name="interestRate" min="0" step="0.01" required>
                 <div class="button-group">
                     <button type="submit">Calculate</button>
+                    <button type="reset" id="mortgageResetBtn">Reset</button>
                 </div>
             </form>
             <div id="mortgageResult" style="font-weight:bold;margin-top:20px;"></div>
@@ -210,7 +211,7 @@
     })();
     document.getElementById('contactForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        emailjs.sendForm('service_6twambp', 'template_b1nqmbo', this)
+        emailjs.sendForm('service_6twambp', 'template_hwxixog', this)
           .then(function() {
             alert('Message sent!');
           }, function(error) {
@@ -307,6 +308,14 @@
         }
     });
     draw();
+
+    // Hide email button on reset
+    document.getElementById('mortgageResetBtn').addEventListener('click', function() {
+        document.getElementById('sendAmortizationEmail').style.display = 'none';
+        document.getElementById('mortgageResult').innerHTML = '';
+        document.getElementById('amortizationSchedule').innerHTML = '';
+        document.getElementById('emailStatus').textContent = '';
+    });
     </script>
 </body>
 </html>
