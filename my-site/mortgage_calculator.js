@@ -56,9 +56,12 @@
                 balance -= principalPayment;
                 if (balance < 0.01) break;
             }
+            const totalPaid = totalPrincipal + totalInterest;
             document.getElementById('mortgageResult').innerHTML =
                 'Monthly Mortgage Payment: <b>$' + (monthlyPayment ? Number(monthlyPayment.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) : '0.00') + '</b>' +
-                '<br><span style="font-weight:bold;">Total Principal Paid: $' + Number(totalPrincipal.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + '<br>Total Interest Paid: $' + Number(totalInterest.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + '</span>';
+                '<br><span style="font-weight:bold;">Total Principal Paid: $' + Number(totalPrincipal.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) +
+                '<br>Total Interest Paid: $' + Number(totalInterest.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) +
+                '<br>Total Amount Paid to Repay Mortgage: $' + Number(totalPaid.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + '</span>';
             // Build table
             let table = '<table style="width:100%;border-collapse:collapse;margin-top:20px;">';
             table += '<thead><tr style="background:#f7f9fa;"><th>Month</th><th>Monthly Payment</th><th>Principal Paid</th><th>Interest Paid</th><th>% Principal</th><th>% Interest</th><th>Balance</th></tr></thead><tbody>';
@@ -75,6 +78,16 @@
             });
             table += `</tbody><tfoot></tfoot></table>`;
             document.getElementById('amortizationSchedule').innerHTML = table;
+            // Show the email button only if table is present
+            document.getElementById('sendAmortizationEmail').style.display = 'inline-block';
+            // Store values for email use
+            document.getElementById('sendAmortizationEmail').dataset.loan = Number(loan).toLocaleString();
+            document.getElementById('sendAmortizationEmail').dataset.rate = rate;
+            document.getElementById('sendAmortizationEmail').dataset.duration = document.getElementById('duration').value + ' ' + document.getElementById('durationType').value;
+            document.getElementById('sendAmortizationEmail').dataset.monthly = Number(monthlyPayment.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+            document.getElementById('sendAmortizationEmail').dataset.totalPrincipal = Number(totalPrincipal.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+            document.getElementById('sendAmortizationEmail').dataset.totalInterest = Number(totalInterest.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+            document.getElementById('sendAmortizationEmail').dataset.totalPaid = Number(totalPaid.toFixed(2)).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
         });
     }
     // EmailJS integration for sending amortization table
@@ -84,24 +97,29 @@
     const sendBtn = document.getElementById('sendAmortizationEmail');
     if (sendBtn) {
         sendBtn.onclick = function() {
-            let userEmail = prompt('Enter your email address to receive the amortization table:');
+            let userEmail = prompt('Enter your email address to receive the amortization details:');
             if (!userEmail) return;
-            // Gather summary info
-            const loan = document.getElementById('loanAmount').value.replace(/[^\d]/g, '');
-            const rate = document.getElementById('interestRate').value;
-            const duration = document.getElementById('duration').value + ' ' + document.getElementById('durationType').value;
-            const monthlyPayment = document.getElementById('mortgageResult').textContent.match(/\$[\d,\.]+/)[0];
+            // Gather summary info from dataset
+            const loan = sendBtn.dataset.loan;
+            const rate = sendBtn.dataset.rate;
+            const duration = sendBtn.dataset.duration;
+            const monthlyPayment = sendBtn.dataset.monthly;
+            const totalPrincipal = sendBtn.dataset.totalPrincipal;
+            const totalInterest = sendBtn.dataset.totalInterest;
+            const totalPaid = sendBtn.dataset.totalPaid;
             const resultHtml = document.getElementById('mortgageResult').innerHTML;
             const tableHtml = document.getElementById('amortizationSchedule').innerHTML;
             // Prepare EmailJS params
-            emailjs.send('service_6twambp', 'template_njjvqxj', {
+            emailjs.send('service_6twambp', 'template_hwxixog', {
                 to_email: userEmail,
                 loan_amount: loan,
                 interest_rate: rate,
                 duration: duration,
                 monthly_payment: monthlyPayment,
-                summary: resultHtml,
-                amortization_table: tableHtml
+                total_principal: totalPrincipal,
+                total_interest: totalInterest,
+                total_paid: totalPaid,
+                amortization_table: tableHtml,
             }).then(function() {
                 document.getElementById('emailStatus').textContent = 'Email sent!';
             }, function(error) {

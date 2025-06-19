@@ -80,6 +80,7 @@
             <button class="tab-btn" onclick="showTab('contact')">Contact</button>
             <button class="tab-btn" onclick="showTab('snake')">Snake Game</button>
             <button class="tab-btn" onclick="showTab('utilities')">Utilities</button>
+            <button class="tab-btn" onclick="showTab('places')">Places</button>
         </div>
         <div id="about" class="tab-content active">
             <!-- About Me Content -->
@@ -172,19 +173,35 @@
             </form>
             <div id="mortgageResult" style="font-weight:bold;margin-top:20px;"></div>
             <div id="amortizationSchedule" style="margin-top:30px;"></div>
-            <button id="sendAmortizationEmail" type="button" class="button-group" style="margin-top:20px;">Email Amortization Table</button>
+            <button id="sendAmortizationEmail" type="button" class="button-group" style="margin-top:20px;display:none;">Email Amortization Details</button>
             <div id="emailStatus" style="margin-top:10px;color:#4caf50;"></div>
         </div>
+        <div id="places" class="tab-content">
+            <div id="places-loader" style="text-align:center;color:#888;">Loading places...</div>
+        </div>
     </div>
-    <!-- JavaScript for tab functionality and game logic -->
-    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <!-- EmailJS UMD build for browser: must be before your own scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="my-site/mortgage_calculator.js"></script>
     <script>
     // Tab switching logic
+    let placesLoaded = false;
     function showTab(tab) {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
         document.querySelector('.tab-btn[onclick*="' + tab + '"]').classList.add('active');
         document.getElementById(tab).classList.add('active');
+        if(tab === 'places' && !placesLoaded) {
+            fetch('my-site/places.html')
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById('places').innerHTML = html;
+                    placesLoaded = true;
+                })
+                .catch(() => {
+                    document.getElementById('places').innerHTML = '<div style="color:red;">Failed to load places.</div>';
+                });
+        }
     }
 
     // Contact form handler (EmailJS)
@@ -291,6 +308,5 @@
     });
     draw();
     </script>
-    <script src="my-site/mortgage_calculator.js"></script>
 </body>
 </html>
