@@ -152,30 +152,50 @@
         </div>
         <div id="utilities" class="tab-content">
             <h2>Utilities</h2>
-            <h3>Mortgage Calculator</h3>
-            <form id="mortgageForm" style="max-width:400px;margin:20px auto;text-align:left;">
-                <label for="loanAmount">Loan Amount</label>
-                <div style="position:relative;">
-                    <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#888;font-size:1.1em;pointer-events:none;">$</span>
-                    <input type="text" id="loanAmount" name="loanAmount" min="0" required style="padding-left:22px;">
-                </div>
-                <label for="duration">Duration</label>
-                <input type="number" id="duration" name="duration" min="1" required>
-                <select id="durationType" name="durationType">
-                    <option value="years">Years</option>
-                    <option value="months">Months</option>
-                </select>
-                <label for="interestRate">Interest Rate (%)</label>
-                <input type="number" id="interestRate" name="interestRate" min="0" step="0.01" required>
-                <div class="button-group">
-                    <button type="submit">Calculate</button>
-                    <button type="reset" id="mortgageResetBtn">Reset</button>
-                </div>
-            </form>
-            <div id="mortgageResult" style="font-weight:bold;margin-top:20px;"></div>
-            <div id="amortizationSchedule" style="margin-top:30px;"></div>
-            <button id="sendAmortizationEmail" type="button" class="button-group" style="margin-top:20px;display:none;">Email Amortization Details</button>
-            <div id="emailStatus" style="margin-top:10px;color:#4caf50;"></div>
+            <a href="#" id="showMortgageLink" style="font-size:1.15em;color:#3498db;text-decoration:underline;cursor:pointer;">Mortgage Calculator</a>
+            <a href="#" id="showDaysBetweenLink" style="font-size:1.15em;color:#3498db;text-decoration:underline;cursor:pointer;margin-left:30px;">Days Between</a>
+            <div id="mortgageCalculatorDetails" style="display:none;">
+                <a href="#" id="closeMortgageLink" style="display:block;font-size:1em;color:#e74c3c;text-decoration:underline;cursor:pointer;margin-bottom:10px;text-align:right;">Close Mortgage Calculator</a>
+                <h3>Mortgage Calculator</h3>
+                <form id="mortgageForm" style="max-width:400px;margin:20px auto;text-align:left;">
+                    <label for="loanAmount">Loan Amount</label>
+                    <div style="position:relative;">
+                        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#888;font-size:1.1em;pointer-events:none;">$</span>
+                        <input type="text" id="loanAmount" name="loanAmount" min="0" required style="padding-left:22px;">
+                    </div>
+                    <label for="duration">Duration</label>
+                    <input type="number" id="duration" name="duration" min="1" required>
+                    <select id="durationType" name="durationType">
+                        <option value="years">Years</option>
+                        <option value="months">Months</option>
+                    </select>
+                    <label for="interestRate">Interest Rate (%)</label>
+                    <input type="number" id="interestRate" name="interestRate" min="0" step="0.01" required>
+                    <div class="button-group">
+                        <button type="submit">Calculate</button>
+                        <button type="reset" id="mortgageResetBtn">Reset</button>
+                    </div>
+                </form>
+                <div id="mortgageResult" style="font-weight:bold;margin-top:20px;"></div>
+                <div id="amortizationSchedule" style="margin-top:30px;"></div>
+                <button id="sendAmortizationEmail" type="button" class="button-group" style="margin-top:20px;display:none;">Email Amortization Details</button>
+                <div id="emailStatus" style="margin-top:10px;color:#4caf50;"></div>
+            </div>
+            <div id="daysBetweenDetails" style="display:none;">
+                <a href="#" id="closeDaysBetweenLink" style="display:block;font-size:1em;color:#e74c3c;text-decoration:underline;cursor:pointer;margin-bottom:10px;text-align:right;">Close Days Between</a>
+                <h3>Days Between Dates</h3>
+                <form id="daysBetweenForm" style="max-width:400px;margin:20px auto;text-align:left;">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" name="startDate" required>
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate" name="endDate" required>
+                    <div class="button-group">
+                        <button type="submit">Calculate</button>
+                        <button type="reset" id="daysBetweenResetBtn">Reset</button>
+                    </div>
+                </form>
+                <div id="daysBetweenResult" style="font-weight:bold;margin-top:20px;"></div>
+            </div>
         </div>
         <div id="places" class="tab-content">
             <div id="places-loader" style="text-align:center;color:#888;">Loading places...</div>
@@ -184,6 +204,7 @@
     <!-- EmailJS UMD build for browser: must be before your own scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="my-site/mortgage_calculator.js"></script>
+    <script src="my-site/days_between.js"></script>
     <script>
     // Tab switching logic
     let placesLoaded = false;
@@ -315,6 +336,39 @@
         document.getElementById('mortgageResult').innerHTML = '';
         document.getElementById('amortizationSchedule').innerHTML = '';
         document.getElementById('emailStatus').textContent = '';
+    });
+
+    // Mortgage Calculator link logic
+    document.getElementById('showMortgageLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        var details = document.getElementById('mortgageCalculatorDetails');
+        if (details.style.display === 'none') {
+            details.style.display = 'block';
+            this.style.display = 'none';
+        }
+        document.getElementById('showDaysBetweenLink').style.display = 'inline';
+        document.getElementById('daysBetweenDetails').style.display = 'none';
+    });
+    document.getElementById('closeMortgageLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('mortgageCalculatorDetails').style.display = 'none';
+        document.getElementById('showMortgageLink').style.display = 'inline';
+    });
+    // Days Between link logic
+    document.getElementById('showDaysBetweenLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        var details = document.getElementById('daysBetweenDetails');
+        if (details.style.display === 'none') {
+            details.style.display = 'block';
+            this.style.display = 'none';
+        }
+        document.getElementById('showMortgageLink').style.display = 'inline';
+        document.getElementById('mortgageCalculatorDetails').style.display = 'none';
+    });
+    document.getElementById('closeDaysBetweenLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('daysBetweenDetails').style.display = 'none';
+        document.getElementById('showDaysBetweenLink').style.display = 'inline';
     });
     </script>
 </body>
