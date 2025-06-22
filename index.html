@@ -78,7 +78,7 @@
             <!-- Tab buttons for navigation -->
             <button class="tab-btn active" onclick="showTab('about')">About Me</button>
             <button class="tab-btn" onclick="showTab('contact')">Contact</button>
-            <button class="tab-btn" onclick="showTab('snake')">Snake Game</button>
+            <button class="tab-btn" onclick="showTab('games')">Games</button>
             <button class="tab-btn" onclick="showTab('utilities')">Utilities</button>
             <button class="tab-btn" onclick="showTab('places')">Places</button>
         </div>
@@ -139,16 +139,9 @@
                 </div>
             </form>
         </div>
-        <div id="snake" class="tab-content">
-            <!-- Snake Game Content -->
-            <div class="title" style="color:#222;">Snake Game</div>
-            <div class="scoreboard">
-                <div class="score" id="score">Score: 0</div>
-                <div class="level" id="level">Level: 1</div>
-            </div>
-            <div id="gameContainer">
-                <canvas id="snakeCanvas" width="800" height="520"></canvas>
-            </div>
+        <div id="games" class="tab-content">
+            <h2>Games</h2>
+            <a href="my-site/snake_game.html" id="showSnakeGameLink" style="font-size:1.15em;color:#3498db;text-decoration:underline;cursor:pointer;">Snake Game</a>
         </div>
         <div id="utilities" class="tab-content">
             <h2>Utilities</h2>
@@ -238,104 +231,6 @@
           }, function(error) {
             alert('Failed to send: ' + JSON.stringify(error));
           });
-    });
-
-    // Snake Game logic
-    const canvas = document.getElementById('snakeCanvas');
-    const ctx = canvas.getContext('2d');
-    const tileSize = 20;
-    const width = canvas.width;
-    const height = canvas.height;
-    let snake = [{x: 10, y: 10}];
-    let direction = {x: 1, y: 0};
-    let meal = randomMeal();
-    let score = 0;
-    let level = 1;
-    let moveDelay = 120;
-    let changingDirection = false;
-    let gameInterval = setInterval(gameLoop, moveDelay);
-
-    function randomMeal() {
-        let pos;
-        do {
-            pos = {
-                x: Math.floor(Math.random() * (width / tileSize)),
-                y: Math.floor(Math.random() * (height / tileSize))
-            };
-        } while (snake.some(seg => seg.x === pos.x && seg.y === pos.y));
-        return pos;
-    }
-
-    function draw() {
-        ctx.fillStyle = '#111';
-        ctx.fillRect(0, 0, width, height);
-        // Draw meal
-        ctx.fillStyle = '#e74c3c';
-        ctx.fillRect(meal.x * tileSize, meal.y * tileSize, tileSize, tileSize);
-        // Draw snake
-        ctx.fillStyle = '#2ecc40';
-        snake.forEach((seg, i) => {
-            ctx.fillRect(seg.x * tileSize, seg.y * tileSize, tileSize, tileSize);
-        });
-    }
-
-    function gameLoop() {
-        changingDirection = false;
-        // Move snake
-        const head = {x: (snake[0].x + direction.x + width / tileSize) % (width / tileSize),
-                      y: (snake[0].y + direction.y + height / tileSize) % (height / tileSize)};
-        // Check self-collision
-        if (snake.some(seg => seg.x === head.x && seg.y === head.y)) {
-            clearInterval(gameInterval);
-            alert('Game Over! Final Score: ' + score);
-            document.location.reload();
-            return;
-        }
-        snake.unshift(head);
-        // Check meal
-        if (head.x === meal.x && head.y === meal.y) {
-            score++;
-            if (score % 10 === 0) {
-                level++;
-                clearInterval(gameInterval);
-                moveDelay = Math.max(40, moveDelay - 15);
-                gameInterval = setInterval(gameLoop, moveDelay);
-            }
-            meal = randomMeal();
-        } else {
-            snake.pop();
-        }
-        draw();
-        document.getElementById('score').textContent = 'Score: ' + score;
-        document.getElementById('level').textContent = 'Level: ' + level;
-    }
-
-    document.addEventListener('keydown', function(e) {
-        if (changingDirection) return;
-        changingDirection = true;
-        switch(e.key) {
-            case 'ArrowUp':
-                if (direction.y !== 1) direction = {x: 0, y: -1};
-                break;
-            case 'ArrowDown':
-                if (direction.y !== -1) direction = {x: 0, y: 1};
-                break;
-            case 'ArrowLeft':
-                if (direction.x !== 1) direction = {x: -1, y: 0};
-                break;
-            case 'ArrowRight':
-                if (direction.x !== -1) direction = {x: 1, y: 0};
-                break;
-        }
-    });
-    draw();
-
-    // Hide email button on reset
-    document.getElementById('mortgageResetBtn').addEventListener('click', function() {
-        document.getElementById('sendAmortizationEmail').style.display = 'none';
-        document.getElementById('mortgageResult').innerHTML = '';
-        document.getElementById('amortizationSchedule').innerHTML = '';
-        document.getElementById('emailStatus').textContent = '';
     });
 
     // Mortgage Calculator link logic

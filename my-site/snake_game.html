@@ -45,6 +45,10 @@
     <div style="margin-top: 30px;">
         <a href="../index.html" style="color:#4caf50; font-size:1.1em; text-decoration:underline;">&larr; Back to Home Page</a>
     </div>
+    <div id="gameEndOptions" style="display:none; margin-top:20px;">
+        <button id="resetGameBtn" style="margin-right:20px;">Reset Game</button>
+        <button id="restartLevelBtn">Restart Level</button>
+    </div>
     <script>
     // Game settings
     const canvas = document.getElementById('snakeCanvas');
@@ -52,15 +56,29 @@
     const tileSize = 20;
     const width = canvas.width;
     const height = canvas.height;
-    let snake = [{x: 10, y: 10}];
-    let direction = {x: 1, y: 0};
-    let meal = randomMeal();
-    let score = 0;
-    let level = 1;
-    let moveDelay = 120;
-    let changingDirection = false;
-    let gameInterval = setInterval(gameLoop, moveDelay);
-
+    let snake, direction, meal, score, level, moveDelay, changingDirection, gameInterval;
+    let lastFailedLevel = 1;
+    let levelStartSnake = [];
+    let levelStartScore = 0;
+    function initGame(startLevel = 1) {
+        snake = [{x: 10, y: 10}];
+        direction = {x: 1, y: 0};
+        meal = randomMeal();
+        score = (startLevel-1)*10;
+        level = startLevel;
+        moveDelay = 120 - (startLevel-1)*15;
+        moveDelay = Math.max(40, moveDelay);
+        changingDirection = false;
+        clearInterval(gameInterval);
+        gameInterval = setInterval(gameLoop, moveDelay);
+        draw();
+        document.getElementById('score').textContent = 'Score: ' + score;
+        document.getElementById('level').textContent = 'Level: ' + level;
+        document.getElementById('gameEndOptions').style.display = 'none';
+        // Save state for restart
+        levelStartSnake = JSON.parse(JSON.stringify(snake));
+        levelStartScore = score;
+    }
     function randomMeal() {
         let pos;
         do {
@@ -71,7 +89,6 @@
         } while (snake.some(seg => seg.x === pos.x && seg.y === pos.y));
         return pos;
     }
-
     function draw() {
         ctx.fillStyle = '#111';
         ctx.fillRect(0, 0, width, height);
@@ -84,7 +101,6 @@
             ctx.fillRect(seg.x * tileSize, seg.y * tileSize, tileSize, tileSize);
         });
     }
-
     function gameLoop() {
         changingDirection = false;
         // Move snake
@@ -93,8 +109,8 @@
         // Check self-collision
         if (snake.some(seg => seg.x === head.x && seg.y === head.y)) {
             clearInterval(gameInterval);
-            alert('Game Over! Final Score: ' + score);
-            document.location.reload();
+            lastFailedLevel = level;
+            document.getElementById('gameEndOptions').style.display = 'block';
             return;
         }
         snake.unshift(head);
@@ -106,6 +122,9 @@
                 clearInterval(gameInterval);
                 moveDelay = Math.max(40, moveDelay - 15);
                 gameInterval = setInterval(gameLoop, moveDelay);
+                // Save state for restart at new level
+                levelStartSnake = JSON.parse(JSON.stringify(snake));
+                levelStartScore = score;
             }
             meal = randomMeal();
         } else {
@@ -115,7 +134,6 @@
         document.getElementById('score').textContent = 'Score: ' + score;
         document.getElementById('level').textContent = 'Level: ' + level;
     }
-
     document.addEventListener('keydown', function(e) {
         if (changingDirection) return;
         changingDirection = true;
@@ -134,7 +152,29 @@
                 break;
         }
     });
-    draw();
+    // End options logic
+    document.getElementById('resetGameBtn').onclick = function() {
+        initGame(1);
+    };
+    document.getElementById('restartLevelBtn').onclick = function() {
+        // Restore snake and score to start of failed level
+        snake = JSON.parse(JSON.stringify(levelStartSnake));
+        direction = {x: 1, y: 0};
+        meal = randomMeal();
+        score = levelStartScore;
+        moveDelay = 120 - (lastFailedLevel-1)*15;
+        moveDelay = Math.max(40, moveDelay);
+        changingDirection = false;
+        clearInterval(gameInterval);
+        gameInterval = setInterval(gameLoop, moveDelay);
+        draw();
+        document.getElementById('score').textContent = 'Score: ' + score;
+        document.getElementById('level').textContent = 'Level: ' + lastFailedLevel;
+        document.getElementById('gameEndOptions').style.display = 'none';
+        level = lastFailedLevel;
+    };
+    // Start game
+    initGame(1);
     </script>
 </body>
 </html>
