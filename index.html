@@ -148,6 +148,7 @@
             <h2>Utilities</h2>
             <a href="#" id="showMortgageLink" style="font-size:1.15em;color:#3498db;text-decoration:underline;cursor:pointer;">Mortgage Calculator</a>
             <a href="#" id="showDaysBetweenLink" style="font-size:1.15em;color:#3498db;text-decoration:underline;cursor:pointer;margin-left:30px;">Days Between</a>
+            <a href="my-site/weather.html" id="showWeatherLink" style="font-size:1.15em;color:#3498db;text-decoration:underline;cursor:pointer;margin-left:30px;">Weather</a>
             <div id="mortgageCalculatorDetails" style="display:none;">
                 <a href="#" id="closeMortgageLink" style="display:block;font-size:1em;color:#e74c3c;text-decoration:underline;cursor:pointer;margin-bottom:10px;text-align:right;">Close Mortgage Calculator</a>
                 <h3>Mortgage Calculator</h3>
@@ -190,6 +191,18 @@
                 </form>
                 <div id="daysBetweenResult" style="font-weight:bold;margin-top:20px;"></div>
             </div>
+            <div id="weatherDetails" style="display:none;">
+                <a href="#" id="closeWeatherLink" style="display:block;font-size:1em;color:#e74c3c;text-decoration:underline;cursor:pointer;margin-bottom:10px;text-align:right;">Close Weather</a>
+                <h3>Weather Forecast</h3>
+                <form id="weatherForm" style="max-width:400px;margin:20px auto;text-align:left;">
+                    <label for="weatherInput">Enter Zip Code or City, State, Country</label>
+                    <input type="text" id="weatherInput" name="weatherInput" autocomplete="off" required style="width:100%;margin-bottom:8px;">
+                    <ul id="citySuggestions" style="list-style:none;padding:0;margin:0 0 8px 0;max-height:120px;overflow-y:auto;background:#f7f7f7;color:#222;border-radius:4px;display:none;"></ul>
+                    <button type="submit">Get Weather</button>
+                </form>
+                <div id="weatherResult" style="font-weight:bold;margin-top:20px;"></div>
+                <div id="weatherForecast" style="margin-top:20px;"></div>
+            </div>
         </div>
         <div id="places" class="tab-content">
             <div id="places-loader" style="text-align:center;color:#888;">Loading places...</div>
@@ -199,6 +212,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="my-site/mortgage_calculator.js"></script>
     <script src="my-site/days_between.js"></script>
+    <script src="my-site/weather.js"></script>
     <script>
     // Tab switching logic
     let placesLoaded = false;
@@ -244,6 +258,8 @@
         }
         document.getElementById('showDaysBetweenLink').style.display = 'inline';
         document.getElementById('daysBetweenDetails').style.display = 'none';
+        document.getElementById('showWeatherLink').style.display = 'inline';
+        document.getElementById('weatherDetails').style.display = 'none';
     });
     document.getElementById('closeMortgageLink').addEventListener('click', function(e) {
         e.preventDefault();
@@ -260,11 +276,69 @@
         }
         document.getElementById('showMortgageLink').style.display = 'inline';
         document.getElementById('mortgageCalculatorDetails').style.display = 'none';
+        document.getElementById('showWeatherLink').style.display = 'inline';
+        document.getElementById('weatherDetails').style.display = 'none';
     });
     document.getElementById('closeDaysBetweenLink').addEventListener('click', function(e) {
         e.preventDefault();
         document.getElementById('daysBetweenDetails').style.display = 'none';
         document.getElementById('showDaysBetweenLink').style.display = 'inline';
+    });
+    // Weather link logic
+    document.getElementById('showWeatherLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        var details = document.getElementById('weatherDetails');
+        if (details.style.display === 'none') {
+            details.style.display = 'block';
+            this.style.display = 'none';
+        }
+        document.getElementById('showMortgageLink').style.display = 'inline';
+        document.getElementById('mortgageCalculatorDetails').style.display = 'none';
+        document.getElementById('showDaysBetweenLink').style.display = 'inline';
+        document.getElementById('daysBetweenDetails').style.display = 'none';
+    });
+    document.getElementById('closeWeatherLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('weatherDetails').style.display = 'none';
+        document.getElementById('showWeatherLink').style.display = 'inline';
+    });
+    // Weather form submission and city suggestion logic
+    document.getElementById('weatherForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var input = document.getElementById('weatherInput').value;
+        document.getElementById('weatherResult').innerText = 'Fetching weather for ' + input + '...';
+        document.getElementById('weatherForecast').innerHTML = '';
+        // Simulate weather data fetching
+        setTimeout(function() {
+            document.getElementById('weatherResult').innerText = 'Current weather in ' + input + ': 72°F, Sunny';
+            document.getElementById('weatherForecast').innerHTML = '<strong>Forecast:</strong><br>Tomorrow: 75°F, Partly Cloudy<br>Next 5 Days: 70-78°F, Mostly Sunny';
+        }, 1000);
+    });
+    // City suggestions logic (mocked)
+    document.getElementById('weatherInput').addEventListener('input', function() {
+        var input = this.value;
+        var suggestionsBox = document.getElementById('citySuggestions');
+        if(input.length > 2) {
+            // Mocked city suggestions
+            var suggestions = ['New York, NY', 'Los Angeles, CA', 'Chicago, IL', 'Houston, TX', 'Phoenix, AZ'];
+            suggestionsBox.innerHTML = '';
+            suggestions.forEach(function(city) {
+                if(city.toLowerCase().includes(input.toLowerCase())) {
+                    var li = document.createElement('li');
+                    li.innerText = city;
+                    li.style.padding = '8px';
+                    li.style.cursor = 'pointer';
+                    li.addEventListener('click', function() {
+                        document.getElementById('weatherInput').value = city;
+                        suggestionsBox.innerHTML = '';
+                    });
+                    suggestionsBox.appendChild(li);
+                }
+            });
+            suggestionsBox.style.display = suggestionsBox.innerHTML === '' ? 'none' : 'block';
+        } else {
+            suggestionsBox.style.display = 'none';
+        }
     });
     </script>
 </body>

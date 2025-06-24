@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather Utility</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background: #e3f2fd; color: #222; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; }
+        .container { max-width: 500px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 24px #0002; padding: 32px 24px 24px 24px; position: relative; }
+        h1 { text-align: center; color: #1976d2; }
+        .back-link { position: absolute; left: 24px; top: 32px; color: #1976d2; text-decoration: underline; font-size: 1.1em; cursor: pointer; }
+        form { margin: 20px 0; }
+        input[type=text] { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #aaa; font-size: 1em; margin-bottom: 8px; }
+        button { background: #1976d2; color: #fff; border: none; border-radius: 6px; padding: 10px 18px; font-size: 1em; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        button:disabled { background: #888; cursor: not-allowed; }
+        ul#citySuggestions { list-style: none; padding: 0; margin: 0 0 8px 0; max-height: 120px; overflow-y: auto; background: #f7f7f7; color: #222; border-radius: 4px; display: none; }
+        ul#citySuggestions li { padding: 6px 10px; cursor: pointer; }
+        ul#citySuggestions li:hover { background: #e3f2fd; }
+        #weatherResult { font-weight: bold; margin-top: 20px; }
+        #weatherForecast { margin-top: 20px; }
+        table { width: 100%; background: #f7f7f7; color: #222; border-radius: 6px; }
+        th, td { padding: 4px 6px; text-align: center; }
+        @media (max-width: 600px) { .container { padding: 12px 2vw 18px 2vw; } .back-link { position: static; display: block; text-align: center; margin-bottom: 10px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html#utilities" class="back-link">&larr; Back to Utilities</a>
+        <h1>Weather Forecast</h1>
+        <form id="weatherForm">
+            <label for="weatherInput">Enter Zip Code or City, State, Country</label>
+            <input type="text" id="weatherInput" name="weatherInput" autocomplete="off" required>
+            <ul id="citySuggestions"></ul>
+            <button type="submit">Get Weather</button>
+        </form>
+        <div id="weatherResult"></div>
+        <div id="weatherForecast"></div>
+    </div>
+    <script src="weather.js"></script>
+</body>
+</html>
