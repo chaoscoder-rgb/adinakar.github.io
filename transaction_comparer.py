@@ -219,78 +219,102 @@ def compare_transactions(df_post_logs, df_pre_logs, df_analysis_fields):
 
     weights_map = df_analysis_fields.set_index('Parameter')['Weight_Num'].to_dict()
 
-    results = []
+    results = [] # Will store dicts for each post_row
 
     for index, post_row in df_post_logs.iterrows():
-        match_found_for_post_row = False
-        best_match_percentage = 0.0  # In case multiple pre_rows match baseline, not strictly needed by current logic
+        match_details_for_row = {
+            'Match Result': 'No',
+            'Total Matched Percentage': 'Not Applicable',
+            'Matched Pre Row Index': None, # Store index of the matched pre_row
+            'Field Matches': {} # Store individual field match status (True/False)
+        }
 
-        for _, pre_row in df_pre_logs.iterrows():
+        # Temp variable to store the actual pre_row data if a match is found
+        # This won't be directly in the main output CSV/Excel rows but used for styling
+        matched_pre_row_data = None
+
+        for pre_index, pre_row in df_pre_logs.iterrows():
             baseline_match = True
-            # Check baseline fields
+            current_field_matches_for_pre_row = {} # For this specific pre_row comparison
+
+            # Check baseline fields first
             for field in baseline_fields:
                 if field not in post_row or field not in pre_row:
-                    # print(f"Warning: Baseline field '{field}' not found in a row. Post: {field in post_row}, Pre: {field in pre_row}")
                     baseline_match = False
                     break
-
                 post_val = post_row[field]
                 pre_val = pre_row[field]
 
-                # Handle NaN explicitly if not already handled by fillna('') during preprocessing
-                # If they were filled with '', then pd.NA comparison might be tricky, direct equality is fine
+                is_field_match = False
                 if pd.isna(post_val) and pd.isna(pre_val):
-                    continue # Both are NaN, consider it a match for this field
-                if pd.isna(post_val) or pd.isna(pre_val):
-                    baseline_match = False # One is NaN, the other is not
-                    break
+                    is_field_match = True
+                elif not pd.isna(post_val) and not pd.isna(pre_val) and post_val == pre_val:
+                    is_field_match = True
 
-                # For dicts, direct comparison works. For other types, direct.
-                if post_val != pre_val:
+                current_field_matches_for_pre_row[field] = is_field_match
+                if not is_field_match:
                     baseline_match = False
-                    break
+                    # break # Don't break here, continue checking other baseline fields for this pre_row
+                           # to capture all baseline mismatches if this pre_row was a candidate
 
-            if baseline_match:
-                match_found_for_post_row = True
-                current_transaction_match_percentage = 0.0
+            if not baseline_match: # If any baseline field did not match for this pre_row
+                # Reset current_field_matches_for_pre_row or ensure it reflects only this attempt
+                # This is important if we were to pick the 'best' pre_row match.
+                # For now, we take the first baseline match.
+                continue # Try next pre_row
 
-                # Calculate comprehensive match percentage (Baseline + Comprehensive fields)
-                for field in all_matchable_fields: # Iterate over all fields defined for matching
-                    if field not in post_row or field not in pre_row:
-                        # print(f"Warning: Field '{field}' for percentage calculation not found. Post: {field in post_row}, Pre: {field in pre_row}")
-                        continue
+            # If we reach here, all baseline fields matched for the current pre_row
+            match_details_for_row['Match Result'] = 'Yes'
+            match_details_for_row['Matched Pre Row Index'] = pre_index
+            matched_pre_row_data = pre_row # Store this specific pre_row
 
+            current_transaction_match_percentage = 0.0
+
+            # Now, evaluate all fields (baseline + comprehensive) for percentage and detailed field matching
+            # against this specific matched_pre_row_data
+            for field in all_matchable_fields:
+                field_match_status = False
+                if field in post_row and field in matched_pre_row_data:
                     post_val = post_row[field]
-                    pre_val = pre_row[field]
+                    pre_val = matched_pre_row_data[field]
 
                     if pd.isna(post_val) and pd.isna(pre_val):
-                        # If both are NaN, and field has weight, count it.
-                        # Or decide if NaNs matching contribute to percentage. Assuming they do if values are identical (both NaN).
+                        field_match_status = True
+                    elif not pd.isna(post_val) and not pd.isna(pre_val) and post_val == pre_val:
+                        field_match_status = True
+
+                    match_details_for_row['Field Matches'][field] = field_match_status
+                    if field_match_status:
                         current_transaction_match_percentage += weights_map.get(field, 0)
-                        continue
-                    if pd.isna(post_val) or pd.isna(pre_val):
-                        continue # Field mismatch if one is NaN
+                else:
+                    match_details_for_row['Field Matches'][field] = False # Field not present in one or both
 
-                    if post_val == pre_val:
-                        current_transaction_match_percentage += weights_map.get(field, 0)
+            match_details_for_row['Total Matched Percentage'] = round(current_transaction_match_percentage * 100, 2)
+            break # Found a baseline match and processed it, move to the next post_row
 
-                # Store this percentage. If there could be multiple pre_row matches,
-                # you might want the highest, but current logic implies one match is enough.
-                best_match_percentage = current_transaction_match_percentage * 100 # Convert to percentage
-                break # Found a baseline match, move to the next post_row
+        results.append(match_details_for_row)
 
-        if match_found_for_post_row:
-            results.append({'Match Result': 'Yes', 'Total Matched Percentage': round(best_match_percentage, 2)})
-        else:
-            results.append({'Match Result': 'No', 'Total Matched Percentage': 'Not Applicable'})
-
+    # Construct the output DataFrame
     output_df = df_post_logs.copy()
-    result_df_part = pd.DataFrame(results, index=output_df.index)
 
-    output_df['Match Result'] = result_df_part['Match Result']
-    output_df['Total Matched Percentage'] = result_df_part['Total Matched Percentage']
+    # Add 'Match Result' and 'Total Matched Percentage' from the results list
+    output_df['Match Result'] = [res['Match Result'] for res in results]
+    output_df['Total Matched Percentage'] = [res['Total Matched Percentage'] for res in results]
 
-    return output_df
+    # Store the detailed field matches and matched pre_row index for later use (styling)
+    # These won't be columns in the final Excel but attributes or separate structures
+    # For simplicity in this step, we can return these details along with the output_df
+    # The main script can then pass them to the Excel writing function.
+
+    # For now, the function signature returns only the output_df.
+    # We need to decide how to pass 'results' (which contains Field Matches and Matched Pre Row Index)
+    # to the styling function.
+    # Option 1: Return a tuple: (output_df, results_details_list)
+    # Option 2: Add them as temporary columns to output_df and drop before final save (less clean)
+
+    # Let's go with Option 1 for clarity.
+    return output_df, results
+
 
 if __name__ == '__main__':
     # This is for testing the function directly
@@ -309,26 +333,211 @@ if __name__ == '__main__':
         print(df_analysis[['Parameter', 'Weight', 'Weight_Num']].head())
 
     print("\nRunning transaction comparison...")
-    comparison_output = compare_transactions(df_post, df_pre, df_analysis)
-    print("\nComparison Output Head:")
-    print(comparison_output.head())
+    # Expecting a tuple: (DataFrame, list_of_match_details_dicts)
+    comparison_output_df, detailed_results = compare_transactions(df_post, df_pre, df_analysis)
+
+    print("\nComparison Output DF Head:")
+    print(comparison_output_df.head())
 
     print("\nValue counts for 'Match Result':")
-    print(comparison_output['Match Result'].value_counts())
+    print(comparison_output_df['Match Result'].value_counts())
 
     print("\nSample of 'Total Matched Percentage' for 'Yes' matches:")
-    print(comparison_output[comparison_output['Match Result'] == 'Yes']['Total Matched Percentage'].head())
+    print(comparison_output_df[comparison_output_df['Match Result'] == 'Yes']['Total Matched Percentage'].head())
 
     print("\nSample of 'Total Matched Percentage' for 'No' matches:")
-    print(comparison_output[comparison_output['Match Result'] == 'No']['Total Matched Percentage'].head())
+    print(comparison_output_df[comparison_output_df['Match Result'] == 'No']['Total Matched Percentage'].head())
 
-    # Save the output to an Excel file for inspection
+    # Example: Print details for the first 'Yes' match found
+    first_yes_match_index = -1
+    for i, detail in enumerate(detailed_results):
+        if detail['Match Result'] == 'Yes':
+            first_yes_match_index = i
+            break
+
+    if first_yes_match_index != -1:
+        print(f"\nDetails for first 'Yes' match (post_row index {first_yes_match_index}):")
+        print(f"  Matched Pre Row Index: {detailed_results[first_yes_match_index].get('Matched Pre Row Index')}")
+        print(f"  Field Matches: {detailed_results[first_yes_match_index].get('Field Matches')}")
+
+
+    # # Save the output to an Excel file for inspection (styling will be separate)
+    # try:
+    #     output_file_path_excel = 'files/comparison_output.xlsx'
+    #     # At this stage, we save the df without styling. Styling will be a separate step.
+    #     comparison_output_df.to_excel(output_file_path_excel, index=False, engine='openpyxl')
+    #     print(f"\nComparison output (without styling) saved to {output_file_path_excel}")
+    # except Exception as e:
+    #     print(f"Error saving output to Excel: {e}")
+
+    # print("Test run of compare_transactions (modified) finished.")
+
+# --- Excel Writing with Styling ---
+from openpyxl import Workbook
+from openpyxl.styles import PatternFill
+from openpyxl.utils.dataframe import dataframe_to_rows
+
+def write_excel_output_with_styling(output_df, detailed_results, df_analysis_fields,
+                                   pre_file_name, post_file_name, num_pre_rows, num_post_rows, # For summary sheet later
+                                   filename="files/comparison_output.xlsx"): # Updated filename
+    """
+    Writes the comparison output to an Excel file with conditional styling on the main sheet
+    and adds a summary sheet.
+    """
+    wb = Workbook()
+    ws_main = wb.active
+    ws_main.title = "Transaction Comparison"
+
+    # Define fills
+    green_fill = PatternFill(start_color="CCFFCC", end_color="CCFFCC", fill_type="solid") # Light Green
+    red_fill = PatternFill(start_color="FFCCCC", end_color="FFCCCC", fill_type="solid")   # Light Red
+
+    # Prepare a copy of the DataFrame for writing to Excel, converting dicts/lists to strings
+    df_for_excel = output_df.copy()
+    for col in df_for_excel.columns:
+        # Check if the column is of object type and its first non-NA element is a dict or list
+        if df_for_excel[col].dtype == 'object':
+            first_valid_item = df_for_excel[col].dropna().iloc[0] if not df_for_excel[col].dropna().empty else None
+            if isinstance(first_valid_item, (dict, list)):
+                df_for_excel[col] = df_for_excel[col].apply(lambda x: str(x) if isinstance(x, (dict, list)) else x)
+
+    # Append DataFrame to the main worksheet
+    for r_idx, row_data in enumerate(dataframe_to_rows(df_for_excel, index=False, header=True), 1):
+        ws_main.append(row_data)
+
+    # Get the list of all columns that could be styled
+    # These are the original columns from post_logs that are also in analysis_fields
+    # and are present in the output_df
+    styleable_columns = [param for param in df_analysis_fields['Parameter'].tolist() if param in output_df.columns]
+
+    header_list = [cell.value for cell in ws_main[1]] # Get header names from the sheet
+    col_name_to_idx = {name: i + 1 for i, name in enumerate(header_list)}
+
+
+    # Apply styling (starting from row 2, as row 1 is header)
+    for ws_row_index, detailed_info in enumerate(detailed_results, 2): # ws_row_index is 2-based for sheet rows
+        if detailed_info['Match Result'] == 'Yes':
+            field_matches = detailed_info.get('Field Matches', {})
+            for field_name, is_match in field_matches.items():
+                if field_name in col_name_to_idx: # Ensure the field is a column in the Excel sheet
+                    col_idx = col_name_to_idx[field_name]
+                    cell = ws_main.cell(row=ws_row_index, column=col_idx)
+                    if is_match:
+                        cell.fill = green_fill
+                    else:
+                        # Only apply red if it's a field that's supposed to be matched.
+                        # This prevents coloring non-data columns if they somehow end up in field_matches.
+                        if field_name in styleable_columns:
+                             cell.fill = red_fill
+
+    # --- Summary Sheet Creation ---
+    ws_summary = wb.create_sheet("Comparison Summary")
+
+    # Add static info and overall stats
+    summary_data = [
+        ("Pre-File Name:", pre_file_name),
+        ("Post-File Name:", post_file_name),
+        ("Number of Rows in Pre-File:", num_pre_rows),
+        ("Number of Rows in Post-File:", num_post_rows),
+        ("Count of Exact Matches (Baseline):", output_df[output_df['Match Result'] == 'Yes'].shape[0]),
+        ("Count of Mismatches (Baseline):", output_df[output_df['Match Result'] == 'No'].shape[0]),
+    ]
+
+    for r_idx, (label, value) in enumerate(summary_data, 1):
+        ws_summary.cell(row=r_idx, column=1, value=label)
+        ws_summary.cell(row=r_idx, column=2, value=value)
+
+    # Add a small gap before the pivot table
+    current_row_in_summary = len(summary_data) + 2
+    ws_summary.cell(row=current_row_in_summary, column=1, value="Matches Grouped by User ID, Error Code, Requesting Service:")
+    current_row_in_summary += 1
+
+    # Generate and write pivot table
+    if not output_df[output_df['Match Result'] == 'Yes'].empty:
+        matched_df = output_df[output_df['Match Result'] == 'Yes']
+        try:
+            pivot_table = pd.pivot_table(
+                matched_df,
+                index=['User ID', 'Error Code', 'Requesting Service'],
+                aggfunc='size', # Count occurrences
+                fill_value=0
+            ).reset_index(name='Match Count') # Convert to DataFrame and name the count column
+
+            # Write pivot table header
+            for c_idx, value in enumerate(pivot_table.columns, 1):
+                ws_summary.cell(row=current_row_in_summary, column=c_idx, value=value)
+            current_row_in_summary +=1
+
+            # Write pivot table rows
+            for _, pivot_row in pivot_table.iterrows():
+                for c_idx, value in enumerate(pivot_row, 1):
+                    ws_summary.cell(row=current_row_in_summary, column=c_idx, value=value)
+                current_row_in_summary += 1
+        except Exception as e:
+            ws_summary.cell(row=current_row_in_summary, column=1, value=f"Error generating pivot table: {e}")
+    else:
+        ws_summary.cell(row=current_row_in_summary, column=1, value="No 'Yes' matches to generate pivot table.")
+
     try:
-        output_file_path_excel = 'files/comparison_output.xlsx'
-        # Using openpyxl engine, which should be installed. index=False to not write pandas index to file.
-        comparison_output.to_excel(output_file_path_excel, index=False, engine='openpyxl')
-        print(f"\nComparison output saved to {output_file_path_excel}")
+        wb.save(filename)
+        print(f"\nStyled comparison output with summary sheet saved to {filename}")
     except Exception as e:
-        print(f"Error saving output to Excel: {e}")
+        print(f"Error saving styled Excel output: {e}")
 
-    print("Test run of compare_transactions finished.")
+
+if __name__ == '__main__':
+    # This is for testing the function directly
+    df_analysis, df_pre, df_post = load_and_preprocess_data()
+
+    if df_analysis is None or df_pre is None or df_post is None:
+        print("Data loading failed. Exiting.")
+    else:
+        print("\nData types in df_analysis_fields:")
+        print(df_analysis.dtypes)
+
+        if 'Weight_Num' in df_analysis.columns:
+            print("\nNumeric weights in df_analysis_fields:")
+            print(df_analysis[['Parameter', 'Weight', 'Weight_Num']].head())
+
+        print("\nRunning transaction comparison...")
+        comparison_output_df, detailed_results = compare_transactions(df_post, df_pre, df_analysis)
+
+        print("\nComparison Output DF Head:")
+        print(comparison_output_df.head())
+
+        print("\nValue counts for 'Match Result':")
+        print(comparison_output_df['Match Result'].value_counts())
+        print("\nSample of 'Total Matched Percentage' for 'Yes' matches:")
+        print(comparison_output_df[comparison_output_df['Match Result'] == 'Yes']['Total Matched Percentage'].head())
+        print("\nSample of 'Total Matched Percentage' for 'No' matches:")
+        print(comparison_output_df[comparison_output_df['Match Result'] == 'No']['Total Matched Percentage'].head())
+
+        first_yes_match_index = -1
+        for i, detail in enumerate(detailed_results):
+            if detail['Match Result'] == 'Yes':
+                first_yes_match_index = i
+                break
+        if first_yes_match_index != -1:
+            print(f"\nDetails for first 'Yes' match (post_row index {first_yes_match_index}):")
+            print(f"  Matched Pre Row Index: {detailed_results[first_yes_match_index].get('Matched Pre Row Index')}")
+            # Limiting print output for long Field Matches dictionary
+            field_matches_sample = dict(list(detailed_results[first_yes_match_index].get('Field Matches', {}).items())[:5])
+            print(f"  Field Matches (sample): {field_matches_sample}")
+
+
+        # Call the new function to write styled Excel output
+        # File names and row counts for summary sheet (will be used in next step)
+        pre_file_name = "splunk_log_data_pre.csv" # Example, ideally get from actual load
+        post_file_name = "splunk_log_data_post.csv"
+        num_pre_rows = len(df_pre)
+        num_post_rows = len(df_post)
+
+        write_excel_output_with_styling(
+            comparison_output_df,
+            detailed_results,
+            df_analysis, # Pass df_analysis_fields for column names
+            pre_file_name, post_file_name, num_pre_rows, num_post_rows, # Pass summary info
+            filename="files/comparison_output.xlsx" # Ensure it's .xlsx
+        )
+
+        print("Test run with styled Excel output finished.")
