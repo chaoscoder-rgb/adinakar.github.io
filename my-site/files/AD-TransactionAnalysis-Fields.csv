@@ -1,0 +1,14 @@
+﻿Match Group,Parameter,Weight,Example,Validation Rule
+Baseline,User ID,10%,user_12345,Exact match
+Baseline,Requesting Service,10%,payment-service (From headers),Service name in X-Service-Name
+Baseline,Error Code,10%,500,Exact match
+Baseline,Error Description,10%,"""DB_CONNECTION_TIMEOUT""",Fuzzy match (85% similarity)
+Baseline,HTTP Method,10%,POST,Exact match
+Comprehensive,Request Headers,8%,"{ ""Content-Type"": ""application/json"" }",Key-value pair match
+Comprehensive,Request Payload,10%,"{ ""amount"": 100, ""currency"": ""USD"" }",Field-level comparison
+Comprehensive,Response Body,10%,"{ ""error"": ""INSUFFICIENT_INVENTORY"" }",Fuzzy match (key structure + data)
+Comprehensive,Responding Service,5%,inventory-service,Downstream service log correlation
+Comprehensive,Release Version,5%,v2.1.0,Exact match
+Comprehensive,Location,5%,region: EU,Geo-IP match
+Comprehensive,Device/OS,4%,"iPhone 14, iOS 16",User-Agent parsing
+Comprehensive,Session ID,3%,sess_abcd1234,Exact match
