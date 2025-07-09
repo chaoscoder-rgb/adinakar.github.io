@@ -373,13 +373,14 @@ if __name__ == '__main__':
     # print("Test run of compare_transactions (modified) finished.")
 
 # --- Excel Writing with Styling ---
+import datetime # Added for timestamp
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill
 from openpyxl.utils.dataframe import dataframe_to_rows
 
 def write_excel_output_with_styling(output_df, detailed_results, df_analysis_fields,
                                    pre_file_name, post_file_name, num_pre_rows, num_post_rows, # For summary sheet later
-                                   filename="files/comparison_output.xlsx"): # Updated filename
+                                   filename="files/comparison_output.xlsx"): # Default filename, will be overridden
     """
     Writes the comparison output to an Excel file with conditional styling on the main sheet
     and adds a summary sheet.
@@ -526,18 +527,22 @@ if __name__ == '__main__':
 
 
         # Call the new function to write styled Excel output
-        # File names and row counts for summary sheet (will be used in next step)
-        pre_file_name = "splunk_log_data_pre.csv" # Example, ideally get from actual load
+        # File names and row counts for summary sheet
+        pre_file_name = "splunk_log_data_pre.csv"
         post_file_name = "splunk_log_data_post.csv"
         num_pre_rows = len(df_pre)
         num_post_rows = len(df_post)
+
+        # Generate timestamped filename
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_filename = f"files/comparison_output_{timestamp}.xlsx"
 
         write_excel_output_with_styling(
             comparison_output_df,
             detailed_results,
             df_analysis, # Pass df_analysis_fields for column names
-            pre_file_name, post_file_name, num_pre_rows, num_post_rows, # Pass summary info
-            filename="files/comparison_output.xlsx" # Ensure it's .xlsx
+            pre_file_name, post_file_name, num_pre_rows, num_post_rows,
+            filename=output_filename
         )
 
-        print("Test run with styled Excel output finished.")
+        print(f"Test run with styled Excel output finished. File saved as {output_filename}")
