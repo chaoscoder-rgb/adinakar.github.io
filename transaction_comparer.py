@@ -1,6 +1,6 @@
 import pandas as pd
 import ast
-import datetime # Added for timestamp
+import os # Added for counter-based filenames
 
 # --- Excel Writing with Styling (and openpyxl imports moved here) ---
 from openpyxl import Workbook
@@ -305,8 +305,38 @@ if __name__ == '__main__':
         post_file_name = "splunk_log_data_post.csv"
         num_pre_rows = len(df_pre)
         num_post_rows = len(df_post)
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_filename = f"files/comparison_output_{timestamp}.xlsx"
+
+        # Counter-based filename logic
+        output_dir = "files"
+        base_filename = "comparison_output"
+        file_extension = ".xlsx"
+
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir) # Ensure directory exists
+
+        counter = 1
+        # List files and find the highest counter for "comparison_output_*.xlsx"
+        try:
+            existing_files = os.listdir(output_dir)
+            max_counter = 0
+            for f_name in existing_files:
+                if f_name.startswith(base_filename + "_") and f_name.endswith(file_extension):
+                    try:
+                        # Extract number between "_" and ".xlsx"
+                        num_str = f_name[len(base_filename)+1 : -len(file_extension)]
+                        num = int(num_str)
+                        if num > max_counter:
+                            max_counter = num
+                    except ValueError:
+                        # Filename doesn't match the expected numeric counter pattern
+                        pass
+            counter = max_counter + 1
+        except FileNotFoundError:
+            # This might happen if output_dir was just created or is somehow inaccessible briefly
+            # Defaulting to counter = 1 is fine here.
+            pass
+
+        output_filename = os.path.join(output_dir, f"{base_filename}_{counter}{file_extension}")
 
         write_excel_output_with_styling(
             comparison_output_df, # This now contains __Field_Matches__
