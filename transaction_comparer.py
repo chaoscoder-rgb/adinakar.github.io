@@ -17,12 +17,19 @@ def load_and_preprocess_data():
     - 'files/splunk_log_data_post.csv'
     """
     try:
-        df_analysis_fields = pd.read_csv('files/AD-TransactionAnalysis-Fields.csv')
+        # Load the analysis fields mapping from the new file and with new column name for fields
+        df_analysis_fields = pd.read_csv('files/MatchFields.csv') # Path updated to local files/
+        df_analysis_fields.rename(columns={'Field': 'Parameter', 'Match Category': 'Match Group'}, inplace=True) # Rename to expected
+
         df_analysis_fields['Weight_Num'] = df_analysis_fields['Weight'].str.rstrip('%').astype('float') / 100.0
         df_analysis_fields.columns = df_analysis_fields.columns.str.strip()
         for col in df_analysis_fields.columns:
             if df_analysis_fields[col].dtype == 'object':
                 df_analysis_fields[col] = df_analysis_fields[col].str.strip()
+
+        # Ensure 'Parameter' and 'Match Group' are present after renaming
+        if 'Parameter' not in df_analysis_fields.columns or 'Match Group' not in df_analysis_fields.columns:
+            raise ValueError("Critical columns 'Parameter' or 'Match Group' not found after renaming. Check MatchFields.csv headers.")
 
         df_pre_logs = pd.read_csv('files/splunk_log_data_pre.csv')
         df_post_logs = pd.read_csv('files/splunk_log_data_post.csv')
@@ -61,6 +68,11 @@ def load_and_preprocess_data():
                     df[col] = df[col].astype(str).fillna('')
 
         print("Data loaded and preprocessed successfully.")
+        print("\n--- df_analysis_fields Head (after rename):")
+        print(df_analysis_fields.head())
+        print(f"\n--- df_analysis_fields Columns: {df_analysis_fields.columns.tolist()}")
+        print(f"\n--- df_pre_logs Columns: {df_pre_logs.columns.tolist()}")
+        print(f"\n--- df_post_logs Columns: {df_post_logs.columns.tolist()}")
         return df_analysis_fields, df_pre_logs, df_post_logs
     except Exception as e:
         print(f"An error occurred during data loading and preprocessing: {e}")
@@ -72,7 +84,9 @@ def compare_transactions(df_post_logs, df_pre_logs, df_analysis_fields):
     Returns a list of dictionaries, each representing a row for the final report.
     """
     baseline_fields = df_analysis_fields[df_analysis_fields['Match Group'] == 'Baseline']['Parameter'].tolist()
+    print(f"\n--- Baseline Fields being used for matching: {baseline_fields}")
     all_matchable_fields = df_analysis_fields['Parameter'].tolist() # All fields defined in analysis file
+    print(f"\n--- All Matchable Fields from config: {all_matchable_fields}")
 
     weights_map = df_analysis_fields.set_index('Parameter')['Weight_Num'].to_dict()
     output_rows_list = []

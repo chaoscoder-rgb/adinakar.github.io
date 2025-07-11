@@ -1,0 +1,29 @@
+Field,Weight,Match Category
+_si,3%,Baseline
+appid,3%,Baseline
+cf_frontendcall,3%,Baseline
+cluster,3%,Baseline
+container_name,3%,Baseline
+host,3%,Baseline
+hostname,3%,Baseline
+index,3%,Baseline
+labels.app,3%,Baseline
+namespace_labels.CISAR_SYSTEM_ID,3%,Baseline
+namespace_labels.applnstld,3%,Baseline
+namespace_name,3%,Baseline
+ose_channel,3%,Baseline
+jose_countrycode,3%,Baseline
+jose method,3%,Baseline
+sector,3%,Baseline
+message,4%,Comprehensive
+ose_ResponseCode,4%,Comprehensive
+ose_cluster,4%,Comprehensive
+ose_javalog,4%,Comprehensive
+ose_sessionid,4%,Comprehensive
+ose uri,4%,Comprehensive
+pod_id,4%,Comprehensive
+pod_ip,4%,Comprehensive
+pod_name,4%,Comprehensive
+pod_owner,4%,Comprehensive
+source,4%,Comprehensive
+sourcetype,4%,Comprehensive
